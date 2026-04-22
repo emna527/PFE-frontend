@@ -1,0 +1,81 @@
+<div class="ed-wrapper">
+
+  <!-- Header -->
+  <div class="ed-header">
+    <div class="ed-title">
+      <button mat-icon-button
+              routerLink="/admin-dashboard"
+              matTooltip="Retour"
+              class="ed-back-btn">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="ed-title-icon-wrap">
+        <mat-icon class="ed-title-icon">bolt</mat-icon>
+      </div>
+
+      <div>
+        <h2>Energy Dashboard</h2>
+        <span class="ed-sub">SFM Technologies · {{ siteName }}</span>
+      </div>
+    </div>
+
+    <div class="ed-controls">
+
+      <!-- Period tabs -->
+      <div class="ed-tabs">
+        <button
+          *ngFor="let p of periods"
+          class="ed-tab"
+          [class.ed-tab--active]="activePeriod === p.key"
+          (click)="switchPeriod(p.key)">
+          <mat-icon>{{ p.icon }}</mat-icon>
+          {{ p.label }}
+        </button>
+      </div>
+
+      <!-- Refresh -->
+      <button mat-icon-button
+              (click)="loadReport()"
+              matTooltip="Actualiser"
+              class="ed-refresh-btn"
+              [disabled]="loading">
+        <mat-icon [class.ed-spin]="loading">refresh</mat-icon>
+      </button>
+
+      <!-- Logout -->
+      <button class="ed-logout-btn" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Se déconnecter
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="ed-state" *ngIf="loading">
+    <div class="ed-spinner">
+      <div class="ed-spinner-inner"></div>
+    </div>
+    <p>Chargement des données SFM…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="ed-state ed-state--error" *ngIf="error && !loading">
+    <div class="ed-error-icon">
+      <mat-icon>error_outline</mat-icon>
+    </div>
+    <p>{{ error }}</p>
+    <button class="ed-retry-btn" (click)="loadReport()">
+      <mat-icon>refresh</mat-icon> Réessayer
+    </button>
+  </div>
+
+  <!-- Charts -->
+  <div *ngIf="!loading && !error" class="ed-content">
+    <app-daily-chart   *ngIf="activePeriod === 'daily'"   [data]="reportData" />
+    <app-weekly-chart  *ngIf="activePeriod === 'weekly'"  [data]="reportData" />
+    <app-monthly-chart *ngIf="activePeriod === 'monthly'" [data]="reportData" />
+  </div>
+
+</div>

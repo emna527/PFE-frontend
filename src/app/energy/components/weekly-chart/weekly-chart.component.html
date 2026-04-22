@@ -1,0 +1,54 @@
+<div class="ec-section">
+
+  <div class="ec-metrics">
+    <div class="ec-metric">
+      <span class="ec-label">Total kWh</span>
+      <span class="ec-value">{{ totalKwh | number:'1.2-2' }}</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Coût (EUR)</span>
+      <span class="ec-value">{{ totalCost | number:'1.2-2' }} €</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">CO₂ (kg)</span>
+      <span class="ec-value">{{ co2 | number:'1.3-3' }}</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Moy./jour</span>
+      <span class="ec-value">{{ avgDaily | number:'1.2-2' }} kWh</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Prix/kWh</span>
+      <span class="ec-value">{{ costPerKwh | number:'1.2-2' }} €</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Durée</span>
+      <span class="ec-value">{{ durationDays }} jours</span>
+    </div>
+  </div>
+
+  <div class="ec-charts-row">
+
+    <div class="ec-card ec-card--large">
+      <div class="ec-card-header">
+        <div>
+          <p class="ec-card-title">Consommation estimée par jour</p>
+          <p class="ec-card-sub">Répartition pondérée sur {{ period }}</p>
+        </div>
+        <div class="ec-legend">
+          <span class="ec-leg-item">
+            <span class="ec-dot" style="background:#4F6EF7"></span>Jours ouvrés
+          </span>
+          <span class="ec-leg-item">
+            <span class="ec-dot" style="background:rgba(79,110,247,0.35)"></span>Weekend
+          </span>
+        </div>
+      </div>
+      <div class="ec-canvas-wrap ec-canvas-wrap--tall">
+        <canvas #barCanvas></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>

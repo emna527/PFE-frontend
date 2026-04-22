@@ -1,0 +1,345 @@
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div style="position:relative">
+        <div class="pulse-ring"></div>
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <div class="logo-text">EnergyOS</div>
+        <div class="logo-sub">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-label">Navigation</div>
+
+      <a class="nav-item" routerLink="/energy-dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Energy Dashboard
+      </a>
+
+      <a class="nav-item active" href="#">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Utilisateurs
+        <span class="nav-badge">{{ dataSource.data.length || 0 }}</span>
+      </a>
+
+      <a class="nav-item" (click)="showPendingTab = !showPendingTab" [class.active]="showPendingTab" style="cursor:pointer">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Demandes
+        <span class="nav-badge" *ngIf="pendingUsers.length > 0">{{ pendingUsers.length }}</span>
+      </a>
+
+      <div class="sidebar-divider"></div>
+
+      <button class="nav-item nav-item--logout" (click)="logout()">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnecter
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Gestion des utilisateurs</div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9BA5BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Rechercher..." (keyup)="applyFilter($event)">
+        </div>
+        <div class="avatar">AD</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card orange">
+          <div class="stat-header">
+            <div class="stat-icon orange">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">{{ dataSource.data.length || 0 }}</div>
+          <div class="stat-label">Utilisateurs total</div>
+        </div>
+
+        <div class="stat-card blue">
+          <div class="stat-header">
+            <div class="stat-icon blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">5 <span style="font-size:14px;color:var(--text2)">zones</span></div>
+          <div class="stat-label">Zones configurées</div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-header">
+            <div class="stat-icon green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">{{ pendingUsers.length }}</div>
+          <div class="stat-label">Demandes en attente</div>
+        </div>
+
+        <div class="stat-card purple">
+          <div class="stat-header">
+            <div class="stat-icon purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">{{ dataSource.data.length || 0 }}</div>
+          <div class="stat-label">Comptes actifs</div>
+        </div>
+      </div>
+
+      <!-- DEMANDES EN ATTENTE -->
+      <div *ngIf="showPendingTab" class="pending-section">
+        <p class="pending-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Demandes d'inscription en attente
+        </p>
+        <div *ngIf="pendingUsers.length === 0" class="no-pending">
+          ✅ Aucune demande en attente.
+        </div>
+        <table *ngIf="pendingUsers.length > 0" mat-table [dataSource]="pendingUsers" class="pending-table">
+          <ng-container matColumnDef="nomComplet">
+            <th mat-header-cell *matHeaderCellDef>Nom</th>
+            <td mat-cell *matCellDef="let u">{{ u.nomComplet }}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+          </ng-container>
+          <ng-container matColumnDef="tel">
+            <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+            <td mat-cell *matCellDef="let u">{{ u.tel }}</td>
+          </ng-container>
+          <ng-container matColumnDef="areaName">
+            <th mat-header-cell *matHeaderCellDef>Zone</th>
+            <td mat-cell *matCellDef="let u">{{ u.areaName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let u">
+              <button class="btn btn-primary" (click)="openApproveDialog(u.id)" style="margin-right:8px">
+                ✓ Approuver
+              </button>
+              <button class="btn btn-danger" (click)="rejectUser(u.id)">
+                ✕ Refuser
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['nomComplet','email','tel','areaName','actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['nomComplet','email','tel','areaName','actions'];"></tr>
+        </table>
+      </div>
+
+      <!-- TABLE UTILISATEURS -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Liste des utilisateurs
+            <span class="table-count">{{ dataSource.data.length || 0 }} au total</span>
+          </div>
+          <div class="table-actions">
+            <button class="btn btn-outline">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              Exporter
+            </button>
+            <button class="btn btn-primary" (click)="openAddDialog()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ajouter
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9BA5BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="filter-input" type="text" placeholder="Filtrer par nom, email..." (keyup)="applyFilter($event)">
+          <select class="filter-select">
+            <option>Tous les rôles</option>
+            <option>ADMIN</option>
+            <option>USER</option>
+          </select>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" matSort>
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+            <td mat-cell *matCellDef="let user"><span class="td-id">#{{ user.id }}</span></td>
+          </ng-container>
+
+          <ng-container matColumnDef="nomComplet">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Utilisateur</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="user-cell">
+                <div class="user-avatar" [style.background]="getAvatarColor(user.nomComplet)">
+                  {{ user.nomComplet?.charAt(0)?.toUpperCase() }}
+                </div>
+                <div>
+                  <div class="user-name">{{ user.nomComplet }}</div>
+                  <div class="user-email">{{ user.email }}</div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Rôle</th>
+            <td mat-cell *matCellDef="let user">
+              <span class="role-badge" [class.admin]="user.role === 'ADMIN'" [class.user]="user.role === 'USER'">
+                {{ user.role === 'ADMIN' ? '⚡' : '👤' }} {{ user.role }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="tel">
+            <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="phone-cell">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.5 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.95-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                {{ user.tel || '—' }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="telegram">
+            <th mat-header-cell *matHeaderCellDef>Telegram</th>
+            <td mat-cell *matCellDef="let user">{{ user.telegram || '—' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="areaName">
+            <th mat-header-cell *matHeaderCellDef>Zone</th>
+            <td mat-cell *matCellDef="let user">
+              <span *ngIf="user.areaName" class="zone-chip">🏢 {{ user.areaName }}</span>
+              <span *ngIf="!user.areaName">—</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="zoneId">
+            <th mat-header-cell *matHeaderCellDef>Zone ID</th>
+            <td mat-cell *matCellDef="let user"><span class="td-id">{{ user.zoneId || '—' }}</span></td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="actions-cell">
+                <button class="act-btn edit" (click)="openEditDialog(user)" matTooltip="Modifier">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="act-btn delete" (click)="deleteUser(user.id)" matTooltip="Supprimer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">Aucun utilisateur trouvé.</td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ── Dialog Ajouter / Modifier ── -->
+<div *ngIf="showDialog" class="dialog-overlay" (click)="closeDialog()">
+  <div class="dialog-box" (click)="$event.stopPropagation()">
+    <h3>{{ isEditMode ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur' }}</h3>
+    <form [formGroup]="userForm" class="user-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Nom Complet</mat-label>
+        <input matInput formControlName="nomComplet">
+        <mat-error>Champ requis</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email">
+        <mat-error>Email invalide</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" *ngIf="!isEditMode">
+        <mat-label>Mot de passe</mat-label>
+        <input matInput formControlName="password" type="password">
+        <mat-error>Champ requis</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Rôle</mat-label>
+        <mat-select formControlName="role">
+          <mat-option value="USER">USER</mat-option>
+          <mat-option value="ADMIN">ADMIN</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Téléphone</mat-label>
+        <input matInput formControlName="tel">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Telegram</mat-label>
+        <input matInput formControlName="telegram">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Zone (Area Name)</mat-label>
+        <input matInput formControlName="areaName" placeholder="Ex: Etage 1">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Zone ID</mat-label>
+        <input matInput formControlName="zoneId" type="number" placeholder="Ex: 3">
+      </mat-form-field>
+    </form>
+    <div class="dialog-actions">
+      <button class="btn btn-outline" (click)="closeDialog()">Annuler</button>
+      <button class="btn btn-primary" [disabled]="userForm.invalid" (click)="saveUser()">
+        {{ isEditMode ? 'Mettre à jour' : 'Ajouter' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Dialog Approbation ── -->
+<div *ngIf="showApproveDialog" class="dialog-overlay" (click)="showApproveDialog = false">
+  <div class="dialog-box" (click)="$event.stopPropagation()">
+    <h3>Approuver l'utilisateur</h3>
+    <p style="color:#8896b3; font-size:13px; margin-bottom:16px">
+      Assignez une zone à cet utilisateur avant de l'approuver.
+    </p>
+    <form [formGroup]="approveForm" class="user-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Zone ID</mat-label>
+        <input matInput formControlName="zoneId" type="number" placeholder="Ex: 1">
+        <mat-error>Zone ID requis</mat-error>
+      </mat-form-field>
+    </form>
+    <div class="dialog-actions">
+      <button class="btn btn-outline" (click)="showApproveDialog = false">Annuler</button>
+      <button class="btn btn-primary" [disabled]="approveForm.invalid" (click)="confirmApprove()">
+        ✓ Confirmer
+      </button>
+    </div>
+  </div>
+</div>

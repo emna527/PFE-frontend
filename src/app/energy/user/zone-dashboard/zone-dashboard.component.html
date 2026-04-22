@@ -1,0 +1,107 @@
+<div class="zd-wrapper">
+
+  <!-- Header -->
+  <div class="zd-header">
+    <div class="zd-title">
+      <mat-icon class="zd-title-icon">electric_bolt</mat-icon>
+      <div>
+        <h2>Mon Tableau de Bord</h2>
+        <span class="zd-sub">{{ areaInfo?.areaName || areaName || 'Chargement...' }}</span>
+      </div>
+    </div>
+
+    <div class="zd-controls">
+      <div class="zd-tabs">
+        <button
+          *ngFor="let p of periods"
+          class="zd-tab"
+          [class.zd-tab--active]="activePeriod === p.key"
+          (click)="switchPeriod(p.key)">
+          <mat-icon>{{ p.icon }}</mat-icon>
+          {{ p.label }}
+        </button>
+      </div>
+
+      <button mat-icon-button (click)="loadAll()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+      <button mat-raised-button color="warn" (click)="logout()">
+        <mat-icon>logout</mat-icon> Se déconnecter
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="zd-state" *ngIf="loading">
+    <div class="zd-spinner"></div>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="zd-state zd-error" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-stroked-button (click)="loadAll()">Réessayer</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="zoneData && !loading && !error">
+
+    <!-- KPI Cards -->
+    <div class="zd-cards">
+      <div class="zd-card">
+        <mat-icon class="zd-card-icon zd-icon--blue">bolt</mat-icon>
+        <div class="zd-card-value">{{ zoneData.totalKwh | number:'1.1-1' }} kWh</div>
+        <div class="zd-card-label">CONSOMMATION TOTALE</div>
+      </div>
+      <div class="zd-card">
+        <mat-icon class="zd-card-icon zd-icon--gold">euro</mat-icon>
+        <div class="zd-card-value">{{ zoneData.totalCostEur | number:'1.2-2' }} €</div>
+        <div class="zd-card-label">COÛT TOTAL</div>
+      </div>
+      <div class="zd-card">
+        <mat-icon class="zd-card-icon zd-icon--green">eco</mat-icon>
+        <div class="zd-card-value">{{ zoneData.carbonFootprintKgCo2 | number:'1.2-2' }} kg CO₂</div>
+        <div class="zd-card-label">EMPREINTE CARBONE</div>
+      </div>
+      <div class="zd-card">
+        <mat-icon class="zd-card-icon zd-icon--blue">trending_up</mat-icon>
+        <div class="zd-card-value">{{ zoneData.avgDailyKwh | number:'1.1-1' }} kWh</div>
+        <div class="zd-card-label">MOYENNE JOURNALIÈRE</div>
+      </div>
+    </div>
+
+    <!-- Period label -->
+    <p class="zd-period">
+      Période : {{ periodInfo?.startDate ?? '—' }} → {{ periodInfo?.endDate ?? '—' }}
+    </p>
+
+    <!-- Area info -->
+    <div class="zd-area-info" *ngIf="areaInfo">
+      <span><mat-icon>apartment</mat-icon> {{ areaInfo.siteName }}</span>
+      <span><mat-icon>devices</mat-icon> {{ areaInfo.nbrEquipments }} équipements</span>
+      <span><mat-icon>people</mat-icon> {{ areaInfo.nbrPeople }} personnes</span>
+      <span><mat-icon>straighten</mat-icon> {{ areaInfo.surface }} m²</span>
+    </div>
+
+    <!-- Chart -->
+    <div class="zd-chart-card">
+      <div class="zd-chart-header">
+        <p class="zd-chart-title">
+          Consommation
+          <span *ngIf="activePeriod === 'daily'">— 2 derniers jours</span>
+          <span *ngIf="activePeriod === 'weekly'">— 7 derniers jours</span>
+          <span *ngIf="activePeriod === 'monthly'">— 30 derniers jours</span>
+        </p>
+        <p class="zd-chart-sub">{{ areaInfo?.areaName || areaName }}</p>
+      </div>
+
+      <div class="zd-canvas-wrap">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>

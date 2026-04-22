@@ -1,0 +1,165 @@
+<div class="login-wrapper">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="illustration">
+      <div class="card-3d">
+        <div class="avatar">
+          <mat-icon>{{ showForgot ? 'mail_outline' : 'account_circle' }}</mat-icon>
+        </div>
+        <div class="dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="dots">
+          <div class="dot accent"></div>
+        </div>
+        <span class="badge-ok"><mat-icon>check</mat-icon></span>
+        <span class="badge-err" *ngIf="!showForgot"><mat-icon>close</mat-icon></span>
+      </div>
+      <span class="lock-icon">
+        <mat-icon>{{ showForgot ? 'key' : 'lock' }}</mat-icon>
+      </span>
+    </div>
+
+    <div class="left-tagline">
+      <h2>{{ showForgot ? 'Mot de passe oublié ?' : 'Bienvenue !' }}</h2>
+      <p *ngIf="!showForgot">Connectez-vous pour accéder<br/>à votre espace sécurisé.</p>
+      <p *ngIf="showForgot">Entrez votre email pour recevoir<br/>un lien de réinitialisation.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- LOGIN VIEW -->
+    <ng-container *ngIf="!showForgot">
+      <h1>Connexion à votre compte</h1>
+
+      <!-- Message d'erreur login -->
+      <div *ngIf="loginError" class="error-banner">
+        <mat-icon>error_outline</mat-icon> {{ loginError }}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="exemple@email.com"/>
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="form.get('email')?.hasError('required')">L'email est requis</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">Email invalide</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Mot de passe</mat-label>
+          <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password"/>
+          <button mat-icon-button matSuffix (click)="showPassword = !showPassword" type="button">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.get('password')?.hasError('required')">Le mot de passe est requis</mat-error>
+        </mat-form-field>
+
+        <div class="options-row">
+          <span></span>
+          <a class="forgot-link" (click)="openForgot()">Mot de passe oublié ?</a>
+        </div>
+
+        <button mat-raised-button color="primary" class="login-btn"
+                type="submit" [disabled]="form.invalid">
+          <mat-icon>login</mat-icon>
+          Se connecter
+        </button>
+      </form>
+
+      <p class="signup-row">
+        Pas encore de compte ?
+        <a routerLink="/register" class="signup-link">Créer un compte</a>
+      </p>
+    </ng-container>
+
+    <!-- FORGOT PASSWORD VIEW -->
+    <ng-container *ngIf="showForgot">
+      <h1>Réinitialiser le mot de passe</h1>
+
+      <div *ngIf="fpError" class="error-banner">
+        <mat-icon>error_outline</mat-icon> {{ fpError }}
+      </div>
+
+      <div *ngIf="fpSuccess" class="success-box">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <p class="success-title">{{ fpSuccess }}</p>
+      </div>
+
+      <!-- Étape 1 : Email -->
+      <ng-container *ngIf="fpStep === 1">
+        <p class="subtitle">Saisissez votre email pour recevoir un code OTP.</p>
+        <form [formGroup]="forgotForm" (ngSubmit)="submitForgot()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="forgotEmail" placeholder="exemple@email.com"/>
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="forgotForm.get('forgotEmail')?.hasError('required')">L'email est requis</mat-error>
+            <mat-error *ngIf="forgotForm.get('forgotEmail')?.hasError('email')">Adresse email invalide</mat-error>
+          </mat-form-field>
+          <button mat-raised-button color="primary" class="login-btn"
+                  type="submit" [disabled]="forgotForm.invalid || fpLoading">
+            <mat-spinner *ngIf="fpLoading" diameter="20" class="btn-spinner"></mat-spinner>
+            <mat-icon *ngIf="!fpLoading">send</mat-icon>
+            {{ fpLoading ? 'Envoi...' : 'Envoyer le code' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <!-- Étape 2 : Code OTP -->
+      <ng-container *ngIf="fpStep === 2">
+        <p class="subtitle">
+          Un code à 6 chiffres a été envoyé à <strong>{{ fpSentEmail }}</strong>.
+        </p>
+        <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Code OTP</mat-label>
+            <input matInput formControlName="code" placeholder="123456" maxlength="6"/>
+            <mat-icon matSuffix>pin</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" class="login-btn"
+                  type="submit" [disabled]="verifyForm.invalid || fpLoading">
+            <mat-spinner *ngIf="fpLoading" diameter="20" class="btn-spinner"></mat-spinner>
+            <mat-icon *ngIf="!fpLoading">verified</mat-icon>
+            {{ fpLoading ? 'Vérification...' : 'Vérifier le code' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <!-- Étape 3 : Nouveau mot de passe -->
+      <ng-container *ngIf="fpStep === 3">
+        <p class="subtitle">Choisissez votre nouveau mot de passe.</p>
+        <form [formGroup]="resetForm" (ngSubmit)="submitReset()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nouveau mot de passe</mat-label>
+            <input matInput type="password" formControlName="newPassword"/>
+            <mat-icon matSuffix>lock</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirmer le mot de passe</mat-label>
+            <input matInput type="password" formControlName="confirmPassword"/>
+            <mat-icon matSuffix>lock_reset</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" class="login-btn"
+                  type="submit" [disabled]="resetForm.invalid || fpLoading">
+            <mat-spinner *ngIf="fpLoading" diameter="20" class="btn-spinner"></mat-spinner>
+            <mat-icon *ngIf="!fpLoading">save</mat-icon>
+            {{ fpLoading ? 'Sauvegarde...' : 'Enregistrer le mot de passe' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <p class="signup-row">
+        <a class="forgot-link" (click)="backToLogin()">
+          <mat-icon style="font-size:15px;vertical-align:middle;">arrow_back</mat-icon>
+          Retour à la connexion
+        </a>
+      </p>
+    </ng-container>
+
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<div class="register-container">
+  <mat-card>
+    <h2>Créer un compte</h2>
+    <form [formGroup]="form" (ngSubmit)="onRegister()">
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nom Complet</mat-label>
+        <input matInput formControlName="nomComplet" placeholder="Votre nom complet"/>
+        <mat-error *ngIf="form.get('nomComplet')?.hasError('required')">Nom requis</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="exemple@email.com"/>
+        <mat-error *ngIf="form.get('email')?.hasError('required')">Email requis</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">Email invalide</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Mot de passe</mat-label>
+        <input matInput type="password" formControlName="password"/>
+        <mat-error *ngIf="form.get('password')?.hasError('required')">Mot de passe requis</mat-error>
+        <mat-error *ngIf="form.get('password')?.hasError('minlength')">Minimum 6 caractères</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Confirmer le mot de passe</mat-label>
+        <input matInput type="password" formControlName="confirmPassword"/>
+        <mat-error *ngIf="form.hasError('passwordMismatch')">Les mots de passe ne correspondent pas</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Téléphone</mat-label>
+        <input matInput formControlName="tel" placeholder="+216 XX XXX XXX"/>
+        <mat-error *ngIf="form.get('tel')?.hasError('required')">Numéro requis</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Telegram</mat-label>
+        <input matInput formControlName="telegram" placeholder="@username"/>
+        <mat-error *ngIf="form.get('telegram')?.hasError('required')">Telegram requis</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nom de la Zone (Area Name)</mat-label>
+        <input matInput formControlName="areaName" placeholder="Ex: Zone Nord"/>
+        <mat-error *ngIf="form.get('areaName')?.hasError('required')">Zone requise</mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit"
+              class="full-width" [disabled]="!form.valid">
+        Envoyer la demande
+      </button>
+    </form>
+
+    <p class="login-link">
+      Déjà un compte ? <a routerLink="/login">Se connecter</a>
+    </p>
+  </mat-card>
+</div>

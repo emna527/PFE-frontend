@@ -1,0 +1,377 @@
+
+/* ── Variables couleurs énergie ─────────────────────────── */
+:host {
+  --green-dark:    #0D5C3A;
+  --green-main:    #1D9E75;
+  --green-light:   #4ECDA4;
+  --green-pale:    #E8F8F2;
+  --orange-main:   #F97316;
+  --orange-light:  #FED7AA;
+  --orange-pale:   #FFF7ED;
+  --neutral-dark:  #1A2332;
+  --neutral-mid:   #4A5568;
+  --neutral-light: #E2E8F0;
+  --neutral-pale:  #F7FAFC;
+  --white:         #FFFFFF;
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:     0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:     0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.05);
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --radius-xl:     24px;
+}
+
+/* ── Wrapper ─────────────────────────────────────────────── */
+.ed-wrapper {
+  min-height: 100vh;
+  padding: 28px 32px;
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #F0FDF9 0%, #FFF7ED 50%, #F0FDF9 100%);
+  background-attachment: fixed;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Décoration de fond */
+.ed-wrapper::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ed-wrapper::after {
+  content: '';
+  position: fixed;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.ed-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 20px 24px;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(29,158,117,0.1);
+}
+
+/* ── Title ──────────────────────────────────────────────── */
+.ed-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ed-title-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--green-main), var(--green-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(29,158,117,0.35);
+}
+
+.ed-title-icon {
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  color: var(--white) !important;
+}
+
+.ed-title h2 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--neutral-dark);
+  letter-spacing: -0.3px;
+}
+
+.ed-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--neutral-mid);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* ── Back button ────────────────────────────────────────── */
+.ed-back-btn {
+  color: var(--neutral-mid) !important;
+  transition: all 0.2s ease !important;
+}
+
+.ed-back-btn:hover {
+  color: var(--green-main) !important;
+  transform: translateX(-3px);
+}
+
+/* ── Controls ───────────────────────────────────────────── */
+.ed-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Period tabs ─────────────────────────────────────────── */
+.ed-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--neutral-pale);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  border: 1px solid var(--neutral-light);
+}
+
+.ed-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  color: var(--neutral-mid);
+  background: transparent;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.ed-tab mat-icon {
+  font-size: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.ed-tab:hover {
+  color: var(--green-main);
+  background: rgba(29,158,117,0.06);
+}
+
+.ed-tab--active {
+  background: var(--white);
+  color: var(--green-dark);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(29,158,117,0.15);
+}
+
+.ed-tab--active mat-icon {
+  color: var(--green-main);
+}
+
+/* ── Refresh button ──────────────────────────────────────── */
+.ed-refresh-btn {
+  color: var(--neutral-mid) !important;
+  transition: all 0.2s ease !important;
+}
+
+.ed-refresh-btn:hover {
+  color: var(--green-main) !important;
+  background: var(--green-pale) !important;
+}
+
+/* ── Logout button ───────────────────────────────────────── */
+.ed-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--orange-main), #EA580C);
+  box-shadow: 0 4px 12px rgba(249,115,22,0.3);
+  transition: all 0.2s ease;
+}
+
+.ed-logout-btn mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.ed-logout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(249,115,22,0.4);
+  background: linear-gradient(135deg, #FB923C, var(--orange-main));
+}
+
+.ed-logout-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Loading state ───────────────────────────────────────── */
+.ed-state {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 16px;
+  color: var(--neutral-mid);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ed-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-main), var(--green-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ed-spin 1s linear infinite;
+  box-shadow: 0 4px 16px rgba(29,158,117,0.3);
+}
+
+.ed-spinner-inner {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F0FDF9, #FFF7ED);
+}
+
+/* ── Error state ─────────────────────────────────────────── */
+.ed-state--error {
+  color: #C0392B;
+}
+
+.ed-error-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #FEF2F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FECACA;
+}
+
+.ed-error-icon mat-icon {
+  font-size: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  color: #EF4444;
+}
+
+.ed-retry-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 2px solid #EF4444;
+  cursor: pointer;
+  color: #EF4444;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.ed-retry-btn:hover {
+  background: #FEF2F2;
+  transform: translateY(-1px);
+}
+
+/* ── Content ─────────────────────────────────────────────── */
+.ed-content {
+  position: relative;
+  z-index: 1;
+  animation: ed-fade 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes ed-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ed-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ed-spin {
+  animation: ed-spin 1s linear infinite;
+}
+
+/* ── Snackbar ─────────────────────────────────────────────── */
+::ng-deep .snack-error {
+  background: linear-gradient(135deg, #C62828, #EF4444) !important;
+  color: #fff !important;
+  border-radius: var(--radius-md) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+::ng-deep .snack-success {
+  background: linear-gradient(135deg, var(--green-dark), var(--green-main)) !important;
+  color: #fff !important;
+  border-radius: var(--radius-md) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ed-wrapper {
+    padding: 16px;
+  }
+
+  .ed-header {
+    padding: 16px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ed-title h2 {
+    font-size: 17px;
+  }
+
+  .ed-tab {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .ed-logout-btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+}

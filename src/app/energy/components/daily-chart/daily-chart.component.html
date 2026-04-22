@@ -1,0 +1,77 @@
+<div class="ec-section">
+
+  <div class="ec-metrics">
+    <div class="ec-metric">
+      <span class="ec-label">Total kWh</span>
+      <span class="ec-value">{{ totalKwh | number:'1.2-2' }}</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Coût (EUR)</span>
+      <span class="ec-value">{{ totalCost | number:'1.2-2' }} €</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">CO₂ (kg)</span>
+      <span class="ec-value">{{ co2 | number:'1.3-3' }}</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Prix/kWh</span>
+      <span class="ec-value">{{ costPerKwh | number:'1.2-2' }} €</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">kWh/m²</span>
+      <span class="ec-value">{{ kwhPerM2 }}</span>
+    </div>
+    <div class="ec-metric">
+      <span class="ec-label">Appareils</span>
+      <span class="ec-value">{{ devices }}</span>
+    </div>
+  </div>
+
+  <div class="ec-period-info">
+    <span>📅 {{ siteName }} · {{ period }}</span>
+    <span>📐 Surface : {{ surface }} m²</span>
+  </div>
+
+  <div class="ec-charts-row">
+
+    <div class="ec-card ec-card--large">
+      <div class="ec-card-header">
+        <div>
+          <p class="ec-card-title">Consommation du jour</p>
+          <p class="ec-card-sub">vs seuil de référence (50 kWh)</p>
+        </div>
+      </div>
+      <div class="ec-canvas-wrap ec-canvas-wrap--gauge">
+        <canvas #kpiCanvas></canvas>
+        <div class="ec-gauge-center">
+          <span class="ec-gauge-val">{{ totalKwh | number:'1.1-1' }}</span>
+          <span class="ec-gauge-unit">kWh</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ec-alerts" *ngIf="hasAlerts">
+    <p class="ec-alerts-title">Alertes détectées</p>
+    <div class="ec-alerts-list">
+      <div *ngFor="let a of data!.alertsAndAnomalies"
+           class="ec-alert"
+           [class.ec-alert--crit]="a.severity.toLowerCase() === 'high'"
+           [class.ec-alert--warn]="a.severity.toLowerCase() === 'medium'">
+        <span class="ec-sev"
+              [class.ec-sev--crit]="a.severity.toLowerCase() === 'high'"
+              [class.ec-sev--warn]="a.severity.toLowerCase() === 'medium'">{{ a.severity }}</span>
+        <div>
+          <p class="ec-eq">{{ a.equipment }}</p>
+          <p class="ec-desc">{{ a.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ec-no-alerts" *ngIf="!hasAlerts">
+    Aucune anomalie détectée pour cette journée.
+  </div>
+
+</div>
