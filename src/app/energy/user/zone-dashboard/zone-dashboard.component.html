@@ -1,0 +1,255 @@
+<div class="zd-wrapper">
+
+  <!-- ── HEADER ── -->
+  <div class="zd-header">
+    <div class="zd-title">
+      <h1>Ma Zone</h1>
+      <span class="zd-sub">
+        <span class="zd-sub-zone">{{ areaInfo?.areaName || areaName || '...' }}</span>
+        <span class="zd-sub-sep"> - </span>
+        <span class="zd-sub-site">{{ areaInfo?.siteName || 'SFM Tunisie' }}</span>
+      </span>
+    </div>
+
+    <div class="zd-controls">
+      <div class="zd-date-pill">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ today }}</span>
+      </div>
+      <div class="zd-user-pill">
+        <div class="zd-user-avatar"><mat-icon>person</mat-icon></div>
+        <div class="zd-user-info">
+          <span class="zd-user-name">{{ userName }}</span>
+          <span class="zd-user-zone">{{ areaInfo?.areaName || areaName }}</span>
+        </div>
+      </div>
+      <button class="zd-icon-btn" (click)="openEditProfile()" title="Modifier mon profil">
+          <mat-icon>manage_accounts</mat-icon>
+      </button>
+      <button class="zd-icon-btn" (click)="loadAll()" [disabled]="loading" title="Actualiser">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button class="zd-logout-btn" (click)="logout()">
+        <mat-icon>logout</mat-icon> Se déconnecter
+      </button>
+    </div>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div class="zd-state" *ngIf="loading">
+    <div class="zd-spinner"></div>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- ── ERROR ── -->
+  <div class="zd-state" *ngIf="error && !loading">
+    <div class="zd-error-wrap">
+      <mat-icon style="font-size:36px;width:36px;height:36px">error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button class="zd-retry-btn" (click)="loadAll()">
+        <mat-icon>refresh</mat-icon> Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div *ngIf="zoneData && !loading && !error">
+
+    <!-- KPI CARDS -->
+    <div class="zd-cards">
+      <div class="zd-card">
+        <div class="zd-card-icon-wrap zd-icon--orange"><mat-icon>bolt</mat-icon></div>
+        <div class="zd-card-body">
+          <span class="zd-card-label">Consommation totale</span>
+          <div class="zd-card-value">{{ zoneData.totalKwh | number:'1.1-1' }} <span class="zd-unit">kWh</span></div>
+          <div class="zd-card-trend up"><mat-icon>arrow_upward</mat-icon> 12% <span>vs hier</span></div>
+        </div>
+      </div>
+      <div class="zd-card">
+        <div class="zd-card-icon-wrap zd-icon--blue"><mat-icon>euro</mat-icon></div>
+        <div class="zd-card-body">
+          <span class="zd-card-label">Coût total</span>
+          <div class="zd-card-value">{{ zoneData.totalCostEur | number:'1.2-2' }} <span class="zd-unit">€</span></div>
+          <div class="zd-card-trend down"><mat-icon>arrow_downward</mat-icon> 8% <span>vs hier</span></div>
+        </div>
+      </div>
+      <div class="zd-card">
+        <div class="zd-card-icon-wrap zd-icon--green"><mat-icon>eco</mat-icon></div>
+        <div class="zd-card-body">
+          <span class="zd-card-label">Empreinte carbone</span>
+          <div class="zd-card-value">{{ zoneData.carbonFootprintKgCo2 | number:'1.2-2' }} <span class="zd-unit">kg CO₂</span></div>
+          <div class="zd-card-trend up"><mat-icon>arrow_upward</mat-icon> 5% <span>vs hier</span></div>
+        </div>
+      </div>
+      <div class="zd-card">
+        <div class="zd-card-icon-wrap zd-icon--purple"><mat-icon>trending_up</mat-icon></div>
+        <div class="zd-card-body">
+          <span class="zd-card-label">Moyenne journalière</span>
+          <div class="zd-card-value">{{ zoneData.avgDailyKwh | number:'1.1-1' }} <span class="zd-unit">kWh</span></div>
+          <div class="zd-card-trend up"><mat-icon>arrow_upward</mat-icon> 12% <span>vs hier</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE ROW -->
+    <div class="zd-middle-row">
+
+      <!-- Line Chart -->
+      <div class="zd-chart-card">
+        <div class="zd-chart-header">
+          <h3 class="zd-chart-title">
+            Consommation —
+            <span *ngIf="activePeriod === 'daily'">Hier ({{ yesterdayLabel }})</span>
+            <span *ngIf="activePeriod === 'weekly'">7 derniers jours</span>
+            <span *ngIf="activePeriod === 'monthly'">30 derniers jours</span>
+          </h3>
+          <div class="zd-period-tabs">
+            <button *ngFor="let p of periods"
+              class="zd-period-tab"
+              [class.active]="activePeriod === p.key"
+              (click)="switchPeriod(p.key)">
+              {{ p.label }}
+            </button>
+          </div>
+        </div>
+        <div class="zd-canvas-wrap">
+          <canvas #chartCanvas></canvas>
+        </div>
+      </div>
+
+      <!-- Donut -->
+      <div class="zd-donut-card">
+        <h3 class="zd-chart-title">Répartition par usage</h3>
+        <div class="zd-donut-content">
+          <div class="zd-donut-wrap">
+            <canvas #donutCanvas></canvas>
+            <div class="zd-donut-center">
+              <span class="zd-donut-val">{{ zoneData.totalKwh | number:'1.1-1' }}</span>
+              <span class="zd-donut-sub">kWh</span>
+            </div>
+          </div>
+          <div class="zd-donut-legend">
+            <div class="zd-legend-item" *ngFor="let item of donutItems">
+              <span class="zd-legend-dot" [style.background]="item.color"></span>
+              <span class="zd-legend-label">{{ item.label }}</span>
+              <span class="zd-legend-pct">{{ item.pct }}%</span>
+              <span class="zd-legend-kwh">({{ item.kwh | number:'1.1-1' }} kWh)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM STATS -->
+    <div class="zd-bottom-stats" *ngIf="areaInfo">
+      <div class="zd-stat-item">
+        <div class="zd-stat-icon zd-stat--blue"><mat-icon>apartment</mat-icon></div>
+        <div class="zd-stat-info">
+          <span class="zd-stat-label">Équipements</span>
+          <span class="zd-stat-value">{{ areaInfo.nbrEquipments }}</span>
+        </div>
+      </div>
+      <div class="zd-stat-divider"></div>
+      <div class="zd-stat-item">
+        <div class="zd-stat-icon zd-stat--green"><mat-icon>group</mat-icon></div>
+        <div class="zd-stat-info">
+          <span class="zd-stat-label">Personnes</span>
+          <span class="zd-stat-value">{{ areaInfo.nbrPeople }}</span>
+        </div>
+      </div>
+      <div class="zd-stat-divider"></div>
+      <div class="zd-stat-item">
+        <div class="zd-stat-icon zd-stat--orange"><mat-icon>straighten</mat-icon></div>
+        <div class="zd-stat-info">
+          <span class="zd-stat-label">Surface</span>
+          <span class="zd-stat-value">{{ areaInfo.surface }} m²</span>
+        </div>
+      </div>
+    </div>
+    <!-- ── MODAL EDIT PROFILE ── -->
+<div class="zd-modal-overlay" *ngIf="showEditProfile" (click)="closeEditProfile()">
+  <div class="zd-modal" (click)="$event.stopPropagation()">
+
+    <div class="zd-modal-header">
+      <div class="zd-modal-avatar"><mat-icon>person</mat-icon></div>
+      <div>
+        <h3>Mon Profil</h3>
+        <p>Modifier vos informations</p>
+      </div>
+      <button class="zd-modal-close" (click)="closeEditProfile()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="zd-modal-body">
+
+      <div class="zd-mfield">
+        <label>Nom complet</label>
+        <div class="zd-minput">
+          <mat-icon>badge</mat-icon>
+          <input type="text" [(ngModel)]="editNom" placeholder="Votre nom" />
+        </div>
+      </div>
+
+      <div class="zd-mfield">
+        <label>Email</label>
+        <div class="zd-minput">
+          <mat-icon>email</mat-icon>
+          <input type="email" [(ngModel)]="editEmail" placeholder="votre@email.com" />
+        </div>
+      </div>
+
+      <div class="zd-mfield">
+        <label>Téléphone</label>
+        <div class="zd-minput">
+          <mat-icon>phone</mat-icon>
+          <input type="text" [(ngModel)]="editTel" placeholder="+216 XX XXX XXX" />
+        </div>
+      </div>
+
+      <div class="zd-mfield">
+        <label>Telegram</label>
+        <div class="zd-minput">
+          <mat-icon>send</mat-icon>
+          <input type="text" [(ngModel)]="editTelegram" placeholder="@username" />
+        </div>
+      </div>
+
+      <button class="zd-toggle-pwd" (click)="showPwdFields = !showPwdFields">
+        <mat-icon>{{ showPwdFields ? 'lock_open' : 'lock' }}</mat-icon>
+        {{ showPwdFields ? 'Annuler le changement' : 'Changer le mot de passe' }}
+      </button>
+
+      <ng-container *ngIf="showPwdFields">
+        <div class="zd-mfield">
+          <label>Nouveau mot de passe</label>
+          <div class="zd-minput">
+            <mat-icon>lock</mat-icon>
+            <input type="password" [(ngModel)]="editNewPwd" placeholder="Nouveau mot de passe" />
+          </div>
+        </div>
+        <div class="zd-mfield">
+          <label>Confirmer</label>
+          <div class="zd-minput">
+            <mat-icon>lock_outline</mat-icon>
+            <input type="password" [(ngModel)]="editConfirmPwd" placeholder="Confirmer" />
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <div class="zd-modal-actions">
+      <button class="zd-mbtn zd-mbtn--cancel" (click)="closeEditProfile()">Annuler</button>
+      <button class="zd-mbtn zd-mbtn--save" (click)="saveProfile()" [disabled]="editLoading">
+        <mat-icon>{{ editLoading ? 'hourglass_empty' : 'save' }}</mat-icon>
+        {{ editLoading ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+  </div>
+</div>

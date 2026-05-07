@@ -1,0 +1,232 @@
+<div class="ed-wrapper">
+
+  <!-- ══ Top Bar ══ -->
+  <div class="ed-topbar">
+    <div class="ed-topbar-left">
+      <h1 class="ed-page-title">Energy Dashboard</h1>
+      <p class="ed-page-sub">SFM Technologies · {{ siteName }}</p>
+    </div>
+    <div class="ed-topbar-right">
+      <button class="ed-period-btn" [class.ed-period-btn--active]="activePeriod === 'daily'"   (click)="switchPeriod('daily')">
+        <mat-icon>calendar_today</mat-icon> Daily
+      </button>
+      <button class="ed-period-btn" [class.ed-period-btn--active]="activePeriod === 'weekly'"  (click)="switchPeriod('weekly')">
+        <mat-icon>date_range</mat-icon> Weekly
+      </button>
+      <button class="ed-period-btn" [class.ed-period-btn--active]="activePeriod === 'monthly'" (click)="switchPeriod('monthly')">
+        <mat-icon>calendar_month</mat-icon> Monthly
+      </button>
+      <button class="ed-refresh-btn" (click)="loadReport()" [disabled]="loading">
+        <mat-icon [class.ed-spin]="loading">refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ Loading ══ -->
+  <div class="ed-state" *ngIf="loading">
+    <div class="ed-spinner"></div>
+    <p>Chargement des données…</p>
+  </div>
+
+  <!-- ══ Error ══ -->
+  <div class="ed-state ed-state--error" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-stroked-button color="warn" (click)="loadReport()">
+      <mat-icon>refresh</mat-icon> Réessayer
+    </button>
+  </div>
+
+  <ng-container *ngIf="!loading && !error">
+
+    <!-- ══ KPI Row ══ -->
+    <div class="ed-kpi-row">
+      <div class="ed-kpi-card ed-kpi--purple">
+        <span class="ed-kpi-emoji">⚡</span>
+        <div class="ed-kpi-body">
+          <span class="ed-kpi-label">TOTAL KWH</span>
+          <span class="ed-kpi-value">{{ totalKwh | number:'1.2-2' }}</span>
+          <span class="ed-kpi-unit">kilowattheures</span>
+        </div>
+      </div>
+      <div class="ed-kpi-card ed-kpi--green">
+        <span class="ed-kpi-emoji">💶</span>
+        <div class="ed-kpi-body">
+          <span class="ed-kpi-label">COÛT (EUR)</span>
+          <span class="ed-kpi-value">{{ totalCost | number:'1.2-2' }} €</span>
+          <span class="ed-kpi-unit">euros</span>
+        </div>
+      </div>
+      <div class="ed-kpi-card ed-kpi--teal">
+        <span class="ed-kpi-emoji">🌿</span>
+        <div class="ed-kpi-body">
+          <span class="ed-kpi-label">CO₂ (KG)</span>
+          <span class="ed-kpi-value">{{ co2 | number:'1.3-3' }}</span>
+          <span class="ed-kpi-unit">kg CO₂</span>
+        </div>
+      </div>
+      <div class="ed-kpi-card ed-kpi--amber">
+        <span class="ed-kpi-emoji">💰</span>
+        <div class="ed-kpi-body">
+          <span class="ed-kpi-label">PRIX/KWH</span>
+          <span class="ed-kpi-value">{{ costPerKwh | number:'1.2-2' }} €</span>
+          <span class="ed-kpi-unit">par kWh</span>
+        </div>
+      </div>
+      <div class="ed-kpi-card ed-kpi--orange">
+        <span class="ed-kpi-emoji">📐</span>
+        <div class="ed-kpi-body">
+          <span class="ed-kpi-label">KWH/M²</span>
+          <span class="ed-kpi-value">{{ kwhPerM2 }}</span>
+          <span class="ed-kpi-unit">intensité</span>
+        </div>
+      </div>
+      <div class="ed-kpi-card ed-kpi--blue">
+        <span class="ed-kpi-emoji">🔌</span>
+        <div class="ed-kpi-body">
+          <span class="ed-kpi-label">APPAREILS</span>
+          <span class="ed-kpi-value">{{ devices }}</span>
+          <span class="ed-kpi-unit">connectés</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Site Info Bar ══ -->
+    <div class="ed-info-bar">
+      <span class="ed-info-item">
+        <mat-icon class="ed-info-icon">calendar_today</mat-icon>
+        {{ siteName }} · {{ period }}
+      </span>
+      <span class="ed-info-sep">|</span>
+      <span class="ed-info-item">
+        <mat-icon class="ed-info-icon">straighten</mat-icon>
+        Surface : {{ surface }} m²
+      </span>
+    </div>
+
+    <!-- ══ Middle Row: Donut + Hourly Chart ══ -->
+    <div class="ed-mid-row">
+
+      <!-- Donut gauge -->
+      <div class="ed-card ed-card--donut">
+        <div class="ed-card-head">
+          <div>
+            <span class="ed-card-title">Consommation du jour</span>
+            <p class="ed-card-sub">vs seuil de référence (50 kWh)</p>
+          </div>
+          <span class="ed-badge" [class.ed-badge--ok]="totalKwh <= 50" [class.ed-badge--warn]="totalKwh > 50">
+            {{ totalKwh <= 50 ? '✓ Normal' : '⚠ Élevé' }}
+          </span>
+        </div>
+        <div class="ed-donut-wrap">
+          <app-daily-chart   *ngIf="activePeriod === 'daily'"   [data]="reportData" />
+          <app-weekly-chart  *ngIf="activePeriod === 'weekly'"  [data]="reportData" />
+          <app-monthly-chart *ngIf="activePeriod === 'monthly'" [data]="reportData" />
+        </div>
+      </div>
+
+      <!-- Hourly line chart -->
+     <!-- Hourly/Daily/Monthly line chart -->
+<div class="ed-card ed-card--hourly">
+  <div class="ed-card-head">
+    <span class="ed-card-title">{{ trendChartTitle }}</span>
+  </div>
+  <div class="ed-hourly-chart">
+    <canvas #trendCanvas></canvas>
+  </div>
+</div>
+
+    </div>
+
+    <!-- ══ Bottom Row: 3 cards ══ -->
+    <div class="ed-bot-row">
+
+       <!-- Equipment consumption — données réelles -->
+  <div class="ed-card">
+    <div class="ed-card-head">
+      <span class="ed-card-title">Consommation par équipements</span>
+    </div>
+    <div class="ed-equip-list">
+      <div class="ed-empty-state" *ngIf="equipData.length === 0">
+        Aucun équipement disponible
+      </div>
+      <div class="ed-equip-row" *ngFor="let eq of equipData">
+        <span class="ed-equip-name">{{ eq.name }}</span>
+        <div class="ed-equip-bar-wrap">
+          <div class="ed-equip-bar" [style.width]="eq.pct" [style.background]="eq.color"></div>
+        </div>
+        <span class="ed-equip-val">{{ eq.kwh }}</span>
+      </div>
+    </div>
+  </div>
+
+
+ <!-- Evolution — données réelles -->
+<div class="ed-card">
+  <div class="ed-card-head">
+    <span class="ed-card-title">Évolution vs période précédente</span>
+  </div>
+  <div class="ed-evol-body">
+    <span class="ed-evol-value"
+          [class.ed-evol--up]="evolutionPositive"
+          [class.ed-evol--down]="!evolutionPositive">
+      {{ evolutionValue }} {{ evolutionPositive ? '↗' : '↘' }}
+    </span>
+    <div class="ed-evol-detail">
+      <div class="ed-evol-row">
+        <span class="ed-evol-label">vs mois dernier (conso)</span>
+        <span class="ed-evol-badge"
+              [class.ed-badge-up]="!reportData?.trendsComparison?.vsLastMonth?.consumptionChange?.startsWith('-')"
+              [class.ed-badge-down]="reportData?.trendsComparison?.vsLastMonth?.consumptionChange?.startsWith('-')">
+          {{ reportData?.trendsComparison?.vsLastMonth?.consumptionChange ?? '—' }}
+        </span>
+      </div>
+      <div class="ed-evol-row">
+        <span class="ed-evol-label">vs mois dernier (coût)</span>
+        <span class="ed-evol-badge"
+              [class.ed-badge-up]="!reportData?.trendsComparison?.vsLastMonth?.costChange?.startsWith('-')"
+              [class.ed-badge-down]="reportData?.trendsComparison?.vsLastMonth?.costChange?.startsWith('-')">
+          {{ reportData?.trendsComparison?.vsLastMonth?.costChange ?? '—' }}
+        </span>
+      </div>
+      <div class="ed-evol-row">
+        <span class="ed-evol-label">vs année dernière</span>
+        <span class="ed-evol-badge"
+              [class.ed-badge-up]="!reportData?.trendsComparison?.vsLastYear?.consumptionChange?.startsWith('-')"
+              [class.ed-badge-down]="reportData?.trendsComparison?.vsLastYear?.consumptionChange?.startsWith('-')">
+          {{ reportData?.trendsComparison?.vsLastYear?.consumptionChange ?? '—' }}
+        </span>
+      </div>
+    </div>
+    <div class="ed-evol-chart">
+      <canvas #evolutionCanvas></canvas>
+    </div>
+  </div>
+</div>
+
+  <!-- Aucune anomalie -->
+      <div class="ed-no-anomaly" *ngIf="anomalyCount === 0">
+        <span class="ed-no-anomaly-icon">✓</span>
+        Aucune anomalie détectée
+      </div>
+
+      <!-- Liste des anomalies -->
+      <ng-container *ngIf="anomalyCount > 0">
+        <div class="ed-anomaly-alert"
+             *ngFor="let a of anomalies"
+             [class.ed-anomaly--high]="a.severity.toLowerCase() === 'high'"
+             [class.ed-anomaly--medium]="a.severity.toLowerCase() === 'medium'"
+             [class.ed-anomaly--low]="a.severity.toLowerCase() === 'low'">
+          <span class="ed-anomaly-icon">
+            {{ a.severity.toLowerCase() === 'high' ? '🔴' : a.severity.toLowerCase() === 'medium' ? '⚠️' : 'ℹ️' }}
+          </span>
+          <div>
+            <div class="ed-anomaly-text">{{ a.description }}</div>
+            <div class="ed-anomaly-sub">{{ a.equipment }} · {{ a.date }}</div>
+            <div class="ed-anomaly-reco" *ngIf="a.recommendation">
+              💡 {{ a.recommendation }}
+            </div>
+          </div>
+        </div>
+      </ng-container>
+</div>

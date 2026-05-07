@@ -1,0 +1,138 @@
+<div class="eh-wrapper">
+
+  <div class="eh-header">
+    <div class="eh-title">
+      <mat-icon class="eh-title-icon">history</mat-icon>
+      <div>
+        <h2>Energy History</h2>
+        <span class="eh-sub">Historique complet des rapports de consommation</span>
+      </div>
+    </div>
+    <button class="eh-refresh-btn" (click)="loadHistory()" matTooltip="Actualiser">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <div class="eh-filters">
+    <div class="eh-search">
+      <mat-icon>search</mat-icon>
+      <input [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
+             placeholder="Rechercher..." class="eh-search-input" />
+    </div>
+
+    <select [(ngModel)]="filterSite" (ngModelChange)="applyFilter()" class="eh-select">
+      <option value="">Tous les sites</option>
+      <option *ngFor="let s of sites" [value]="s">{{ s }}</option>
+    </select>
+
+    <button class="eh-reset-btn" (click)="resetFilters()">
+      <mat-icon>clear</mat-icon> Réinitialiser
+    </button>
+
+    <span class="eh-count">{{ dataSource.filteredData.length }} entrées</span>
+  </div>
+
+  <div class="eh-state" *ngIf="loading">
+    <div class="eh-spinner"></div>
+    <p>Chargement de l'historique…</p>
+  </div>
+
+  <div class="eh-state eh-state--error" *ngIf="error && !loading">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button (click)="loadHistory()">Réessayer</button>
+  </div>
+
+  <div class="eh-table-wrap" *ngIf="!loading && !error">
+    <table mat-table [dataSource]="dataSource" matSort class="eh-table">
+
+      <ng-container matColumnDef="fetchedAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-date">{{ formatDateTime(row.fetchedAt) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="siteName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Site / Zone</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-site-pill">{{ row.siteName }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="period">
+        <th mat-header-cell *matHeaderCellDef>Période</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-period">
+            {{ formatDate(row.startDate) }} → {{ formatDate(row.endDate) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalKwh">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>kWh total</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-val eh-val--blue">
+            {{ row.totalKwh ? (row.totalKwh | number:'1.2-2') : '—' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalCostEur">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Coût (EUR)</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-val eh-val--orange">
+            {{ row.totalCostEur ? (row.totalCostEur | number:'1.2-2') + ' €' : '—' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="avgDailyKwh">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Moy./jour</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.avgDailyKwh ? (row.avgDailyKwh | number:'1.2-2') + ' kWh' : '—' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="carbonFootprintKgCo2">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>CO₂ (kg)</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-val eh-val--green">
+            {{ row.carbonFootprintKgCo2 ? (row.carbonFootprintKgCo2 | number:'1.2-2') : '—' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="durationDays">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Durée</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.durationDays ? row.durationDays + ' j' : '—' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Statut</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="eh-badge"
+                [class.eh-badge--ok]="row.status === 'success'"
+                [class.eh-badge--err]="row.status !== 'success'">
+            {{ row.status === 'success' ? '✓ OK' : '✗ ' + row.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="eh-row"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="eh-empty" [attr.colspan]="displayedColumns.length">
+          <mat-icon>search_off</mat-icon>
+          <span>Aucun résultat trouvé.</span>
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+  </div>
+
+</div>

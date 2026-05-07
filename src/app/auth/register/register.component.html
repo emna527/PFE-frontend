@@ -1,0 +1,190 @@
+<div class="rg-page">
+
+  <!-- Ambient blobs -->
+  <div class="blob blob--orange"></div>
+  <div class="blob blob--blue"></div>
+
+  <div class="rg-wrapper">
+
+    <!-- ══ LEFT PANEL ══ -->
+    <div class="rg-left">
+
+      <div class="illustration">
+        <div class="dash-card">
+          <div class="dash-topbar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          </div>
+          <div class="dash-body">
+            <div class="dash-chart">
+              <svg viewBox="0 0 120 50" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,45 L20,38 L40,30 L60,20 L80,25 L100,10 L120,15 L120,50 L0,50Z" fill="url(#cg2)"/>
+                <path d="M0,45 L20,38 L40,30 L60,20 L80,25 L100,10 L120,15" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="dash-donut">
+              <svg viewBox="0 0 40 40">
+                <circle cx="20" cy="20" r="15" fill="none" stroke="#1e2d4a" stroke-width="7"/>
+                <circle cx="20" cy="20" r="15" fill="none" stroke="#f97316" stroke-width="7"
+                        stroke-dasharray="40 55" stroke-linecap="round" transform="rotate(-90 20 20)"/>
+                <circle cx="20" cy="20" r="15" fill="none" stroke="#3b82f6" stroke-width="7"
+                        stroke-dasharray="25 70" stroke-dashoffset="-40" stroke-linecap="round" transform="rotate(-90 20 20)"/>
+              </svg>
+            </div>
+          </div>
+          <div class="dash-chips">
+            <div class="chip chip--orange">
+              <span class="chip-icon">⚡</span>
+              <div class="chip-lines"><span></span><span></span></div>
+            </div>
+            <div class="chip chip--blue">
+              <span class="chip-icon">€</span>
+              <div class="chip-lines"><span></span><span></span></div>
+            </div>
+            <div class="chip chip--green">
+              <span class="chip-icon">🌿</span>
+              <div class="chip-lines"><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User card -->
+        <div class="user-card">
+          <div class="user-avatar">👤</div>
+          <div class="user-lines">
+            <span></span><span></span>
+          </div>
+          <div class="user-badge">✔</div>
+        </div>
+
+        <div class="dot-grid dot-grid--tl"></div>
+        <div class="dot-grid dot-grid--br"></div>
+        <div class="lock-badge">🔒</div>
+      </div>
+
+      <div class="left-tagline">
+        <p class="left-title"><span class="bolt">⚡</span> Bienvenue !</p>
+        <p class="left-sub">
+          Créez votre compte pour accéder<br/>
+          à votre espace sécurisé et gérer<br/>
+          votre consommation d'énergie.
+        </p>
+      </div>
+
+      <!-- Dots indicator -->
+      <div class="dots-indicator">
+        <span class="di di--active"></span>
+        <span class="di"></span>
+        <span class="di"></span>
+      </div>
+
+    </div>
+
+    <!-- ══ RIGHT PANEL ══ -->
+    <div class="rg-right">
+
+      <h1><span class="accent">Créer</span> un compte</h1>
+
+      <div *ngIf="errorMsg" class="error-banner">⚠ {{ errorMsg }}</div>
+
+      <form [formGroup]="form" (ngSubmit)="onRegister()" class="rg-form">
+
+        <!-- Nom complet -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('nomComplet')?.invalid && form.get('nomComplet')?.touched">
+          <span class="field-icon">👤</span>
+          <input class="field-input" formControlName="nomComplet" placeholder="Nom complet*"/>
+        </div>
+        <div class="field-error" *ngIf="form.get('nomComplet')?.invalid && form.get('nomComplet')?.touched">
+          Nom complet requis
+        </div>
+
+        <!-- Email -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('email')?.invalid && form.get('email')?.touched">
+          <span class="field-icon">✉</span>
+          <input class="field-input" type="email" formControlName="email" placeholder="Email*"/>
+        </div>
+        <div class="field-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          {{ form.get('email')?.hasError('required') ? 'Email requis' : 'Email invalide' }}
+        </div>
+
+        <!-- Téléphone -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('tel')?.invalid && form.get('tel')?.touched">
+          <span class="field-icon">📞</span>
+          <input class="field-input" formControlName="tel" placeholder="Téléphone*"/>
+        </div>
+        <div class="field-error" *ngIf="form.get('tel')?.invalid && form.get('tel')?.touched">
+          Téléphone requis
+        </div>
+
+        <!-- Telegram -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('telegram')?.invalid && form.get('telegram')?.touched">
+          <span class="field-icon">✈</span>
+          <input class="field-input" formControlName="telegram" placeholder="Telegram"/>
+        </div>
+
+        <!-- Zone -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('areaName')?.invalid && form.get('areaName')?.touched">
+          <span class="field-icon">🏢</span>
+          <input class="field-input" formControlName="areaName" placeholder="Nom de la zone*"/>
+        </div>
+        <div class="field-error" *ngIf="form.get('areaName')?.invalid && form.get('areaName')?.touched">
+          Zone requise
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('password')?.invalid && form.get('password')?.touched">
+          <span class="field-icon">🔒</span>
+          <input class="field-input" [type]="showPass ? 'text' : 'password'"
+                 formControlName="password" placeholder="Mot de passe*"/>
+          <button type="button" class="eye-btn" (click)="showPass = !showPass">
+            {{ showPass ? '🙈' : '👁' }}
+          </button>
+        </div>
+        <div class="field-error" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+          {{ form.get('password')?.hasError('required') ? 'Mot de passe requis' : 'Minimum 6 caractères' }}
+        </div>
+
+        <!-- Confirmer mot de passe -->
+        <div class="field-wrap" [class.field-wrap--error]="form.get('confirmPassword')?.touched && form.hasError('passwordMismatch')">
+          <span class="field-icon">🔒</span>
+          <input class="field-input" [type]="showConfirm ? 'text' : 'password'"
+                 formControlName="confirmPassword" placeholder="Confirmer le mot de passe*"/>
+          <button type="button" class="eye-btn" (click)="showConfirm = !showConfirm">
+            {{ showConfirm ? '🙈' : '👁' }}
+          </button>
+        </div>
+        <div class="field-error" *ngIf="form.get('confirmPassword')?.touched && form.hasError('passwordMismatch')">
+          Les mots de passe ne correspondent pas
+        </div>
+
+        <!-- Terms -->
+        <label class="terms-row">
+          <input type="checkbox" [(ngModel)]="acceptTerms" [ngModelOptions]="{standalone: true}" class="terms-check"/>
+          <span class="terms-text">
+            J'accepte les <a class="terms-link">Conditions d'utilisation</a>
+            et la <a class="terms-link">Politique de confidentialité</a>
+          </span>
+        </label>
+
+        <!-- Submit -->
+        <button class="submit-btn" type="submit" [disabled]="form.invalid || !acceptTerms || loading">
+          <span *ngIf="loading" class="spinner"></span>
+          <span *ngIf="!loading">👤</span>
+          {{ loading ? 'Envoi...' : 'Créer mon compte' }}
+        </button>
+
+      </form>
+
+      <p class="login-row">
+        Vous avez déjà un compte ?
+        <a routerLink="/login" class="login-link">Se connecter</a>
+      </p>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,380 @@
+<div class="eb-layout">
+
+  <!-- ══════════════════ SIDEBAR ══════════════════ -->
+  <aside class="eb-sidebar">
+
+  <div class="eb-brand">
+    <div class="eb-brand-icon">
+      <mat-icon>bolt</mat-icon>
+    </div>
+    <div class="eb-brand-text">
+      <span class="eb-brand-name">EnergyBot</span>
+      <span class="eb-brand-sub">⚡</span>
+    </div>
+  </div>
+
+  <nav class="eb-nav">
+
+    <span class="eb-nav-section">Gestion</span>
+
+    <button class="eb-nav-item"
+            (click)="goToUsers()"
+            [class.eb-nav-item--active]="!isEnergyRoute && !showPendingTab">
+      <span class="eb-nav-icon"><mat-icon>dashboard</mat-icon></span>
+      <span>Tableau de bord</span>
+      <span class="eb-nav-count">{{ dataSource.data.length }}</span>
+    </button>
+
+    <button class="eb-nav-item"
+            (click)="openDemandes()"
+            [class.eb-nav-item--active]="showPendingTab && !isEnergyRoute">
+      <span class="eb-nav-icon"><mat-icon>warning_amber</mat-icon></span>
+      <span>Demandes</span>
+      <span *ngIf="pendingUsers.length > 0" class="eb-badge">{{ pendingUsers.length }}</span>
+    </button>
+
+    <button class="eb-nav-item" (click)="openAddDialog()">
+      <span class="eb-nav-icon"><mat-icon>person_add</mat-icon></span>
+      <span>Ajouter</span>
+    </button>
+
+    <span class="eb-nav-section" style="margin-top:10px">Monitoring</span>
+
+    <button class="eb-nav-item"
+            routerLink="consommation"
+            routerLinkActive="eb-nav-item--active">
+      <span class="eb-nav-icon"><mat-icon>bolt</mat-icon></span>
+      <span>Consommation</span>
+    </button>
+
+    <button class="eb-nav-item"
+            routerLink="energy-history"
+            routerLinkActive="eb-nav-item--active">
+      <span class="eb-nav-icon"><mat-icon>history</mat-icon></span>
+      <span>Energy History</span>
+    </button>
+
+    <button class="eb-nav-item">
+      <span class="eb-nav-icon"><mat-icon>description</mat-icon></span>
+      <span>Rapports</span>
+    </button>
+
+    <div class="eb-nav-divider"></div>
+
+    <button class="eb-nav-item eb-nav-item--logout" (click)="logout()">
+      <span class="eb-nav-icon"><mat-icon>logout</mat-icon></span>
+      <span>Déconnecter</span>
+    </button>
+
+  </nav>
+
+  <div class="eb-sidebar-footer">
+    <div class="eb-user-pill">
+      <div class="eb-user-avatar">
+        <mat-icon>shield</mat-icon>
+      </div>
+      <div class="eb-user-info">
+        <span class="eb-user-name">Admin</span>
+        <span class="eb-user-role">Super Administrateur</span>
+      </div>
+      <button class="eb-logout-btn" (click)="logout()" matTooltip="Déconnecter">
+        <mat-icon>expand_more</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</aside>
+
+  <!-- ══════════════════ MAIN CONTENT ══════════════════ -->
+  <main class="eb-main">
+
+    <!-- Top Bar (users page only) -->
+    <div class="eb-topbar" *ngIf="!isEnergyRoute">
+      <div class="eb-topbar-left">
+        <h1 class="eb-page-title">Utilisateurs</h1>
+        <p class="eb-page-sub">Gérez les utilisateurs et leurs accès</p>
+      </div>
+      <div class="eb-topbar-right">
+        <div class="eb-search-box-top">
+          <mat-icon>search</mat-icon>
+          <input class="eb-search-input" (keyup)="applyFilter($event)" placeholder="Rechercher un utilisateur…"/>
+        </div>
+        <button class="eb-add-btn-top" (click)="openAddDialog()">
+          <mat-icon>add</mat-icon> Ajouter un utilisateur
+        </button>
+      </div>
+    </div>
+
+    <!-- Energy / History child route -->
+    <router-outlet></router-outlet>
+
+    <ng-container *ngIf="!isEnergyRoute">
+
+      <!-- ══ KPI CARDS ══ -->
+      <div class="eb-kpi-row" *ngIf="!showPendingTab">
+        <div class="eb-kpi-card">
+          <div class="eb-kpi-icon eb-kpi-icon--blue">
+            <mat-icon>group</mat-icon>
+          </div>
+          <div class="eb-kpi-info">
+            <span class="eb-kpi-label">Total utilisateurs</span>
+            <span class="eb-kpi-value">{{ dataSource.data.length }}</span>
+          </div>
+        </div>
+        <div class="eb-kpi-card">
+          <div class="eb-kpi-icon eb-kpi-icon--green">
+            <mat-icon>verified_user</mat-icon>
+          </div>
+          <div class="eb-kpi-info">
+            <span class="eb-kpi-label">Utilisateurs actifs</span>
+            <span class="eb-kpi-value">{{ dataSource.data.length - pendingUsers.length }}</span>
+            
+          </div>
+        </div>
+        <div class="eb-kpi-card">
+          <div class="eb-kpi-icon eb-kpi-icon--amber">
+            <mat-icon>admin_panel_settings</mat-icon>
+          </div>
+          <div class="eb-kpi-info">
+            <span class="eb-kpi-label">Administrateurs</span>
+            <span class="eb-kpi-value">{{ adminCount }}</span>
+            
+          </div>
+        </div>
+        <div class="eb-kpi-card">
+          <div class="eb-kpi-icon eb-kpi-icon--purple">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="eb-kpi-info">
+            <span class="eb-kpi-label">Utilisateurs</span>
+            <span class="eb-kpi-value">{{ userCount }}</span>
+         
+          </div>
+        </div>
+      </div>
+
+      <!-- Section / Demandes -->
+      <div *ngIf="showPendingTab" class="eb-section">
+        <div class="eb-section-head">
+          <mat-icon>pending_actions</mat-icon>
+          <h3>Demandes d'inscription en attente</h3>
+        </div>
+        <div *ngIf="pendingUsers.length === 0" class="eb-empty">
+          <mat-icon>check_circle</mat-icon>
+          <span>Aucune demande en attente.</span>
+        </div>
+        <table *ngIf="pendingUsers.length > 0" mat-table [dataSource]="pendingUsers" class="eb-table">
+          <ng-container matColumnDef="nomComplet">
+            <th mat-header-cell *matHeaderCellDef>Nom</th>
+            <td mat-cell *matCellDef="let u">{{ u.nomComplet }}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+          </ng-container>
+          <ng-container matColumnDef="tel">
+            <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+            <td mat-cell *matCellDef="let u">{{ u.tel }}</td>
+          </ng-container>
+          <ng-container matColumnDef="areaName">
+            <th mat-header-cell *matHeaderCellDef>Zone</th>
+            <td mat-cell *matCellDef="let u">{{ u.areaName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let u">
+              <button mat-raised-button color="primary" (click)="openApproveDialog(u.id)" class="eb-btn-approve">
+                <mat-icon>check</mat-icon> Approuver
+              </button>
+              <button mat-raised-button color="warn" (click)="rejectUser(u.id)" class="eb-btn-reject">
+                <mat-icon>close</mat-icon> Refuser
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['nomComplet','email','tel','areaName','actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['nomComplet','email','tel','areaName','actions'];"></tr>
+        </table>
+      </div>
+
+      <!-- Table Utilisateurs -->
+      <div class="eb-section" *ngIf="!showPendingTab">
+        <div class="eb-table-toolbar">
+          <button class="eb-filter-btn">
+            <mat-icon>filter_list</mat-icon> Filtres
+          </button>
+          <div class="eb-toolbar-right">
+            <select class="eb-role-select" (change)="applyRoleFilter($any($event.target).value)">
+              <option *ngFor="let r of roles">{{ r }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="eb-table-wrap">
+          <table mat-table [dataSource]="dataSource" matSort class="eb-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+              <td mat-cell *matCellDef="let user; let i = index" class="eb-cell-id">{{ i + 1 }}</td>
+            </ng-container>
+            <ng-container matColumnDef="nomComplet">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom complet</th>
+              <td mat-cell *matCellDef="let user">
+                <div class="eb-user-cell">
+                  <div class="eb-avatar" [style.background]="getAvatarColor(user.nomComplet)">
+                    {{ user.nomComplet?.charAt(0)?.toUpperCase() }}
+                  </div>
+                  <span>{{ user.nomComplet }}</span>
+                </div>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Rôle</th>
+              <td mat-cell *matCellDef="let user">
+                <span [class]="'eb-role-badge eb-role-badge--' + user.role?.toLowerCase()">{{ user.role }}</span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="tel">
+              <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+              <td mat-cell *matCellDef="let user" class="eb-muted">{{ user.tel }}</td>
+            </ng-container>
+            <ng-container matColumnDef="telegram">
+              <th mat-header-cell *matHeaderCellDef>Telegram</th>
+              <td mat-cell *matCellDef="let user" class="eb-muted">{{ user.telegram }}</td>
+            </ng-container>
+            <ng-container matColumnDef="areaName">
+              <th mat-header-cell *matHeaderCellDef>Zone</th>
+              <td mat-cell *matCellDef="let user">
+                <span class="eb-zone-pill" *ngIf="user.areaName">
+                  <span class="eb-zone-pill-dot"></span>{{ user.areaName }}
+                </span>
+                <span class="eb-muted" *ngIf="!user.areaName">–</span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="zoneId">
+              <th mat-header-cell *matHeaderCellDef>Zone ID</th>
+              <td mat-cell *matCellDef="let user" class="eb-muted">{{ user.zoneId || '–' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="statut">
+              <th mat-header-cell *matHeaderCellDef>Statut</th>
+              <td mat-cell *matCellDef="let user">
+                <span [class]="'eb-status-badge ' + (user.status === 'INACTIVE' ? 'eb-status-badge--inactive' : 'eb-status-badge--active')">
+                  <span class="eb-status-dot"></span>
+                  {{ user.status === 'INACTIVE' ? 'Inactif' : 'Actif' }}
+                </span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button class="eb-icon-btn eb-icon-btn--edit" (click)="openEditDialog(user)" matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button class="eb-icon-btn eb-icon-btn--del" (click)="deleteUser(user.id)" matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell eb-no-data" [attr.colspan]="displayedColumns.length">
+                <mat-icon>search_off</mat-icon>
+                <span>Aucun utilisateur trouvé.</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Pagination custom style -->
+        <div class="eb-pagination-row">
+          <span class="eb-pagination-info">
+            Affichage de 1 à {{ dataSource.filteredData.length }} sur {{ dataSource.data.length }} utilisateurs
+          </span>
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="eb-paginator"></mat-paginator>
+        </div>
+      </div>
+
+    </ng-container>
+  </main>
+</div>
+
+<!-- Dialog Ajouter / Modifier -->
+<div *ngIf="showDialog" class="eb-overlay" (click)="closeDialog()">
+  <div class="eb-dialog" (click)="$event.stopPropagation()">
+    <div class="eb-dialog-header">
+      <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+      <h3>{{ isEditMode ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur' }}</h3>
+    </div>
+    <form [formGroup]="userForm" class="eb-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Nom Complet</mat-label>
+        <input matInput formControlName="nomComplet">
+        <mat-error>Champ requis</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email">
+        <mat-error>Email invalide</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" *ngIf="!isEditMode">
+        <mat-label>Mot de passe</mat-label>
+        <input matInput formControlName="password" type="password">
+        <mat-error>Champ requis</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Rôle</mat-label>
+        <mat-select formControlName="role">
+          <mat-option value="USER">USER</mat-option>
+          <mat-option value="ADMIN">ADMIN</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Téléphone</mat-label>
+        <input matInput formControlName="tel">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Telegram</mat-label>
+        <input matInput formControlName="telegram">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Zone (Area Name)</mat-label>
+        <input matInput formControlName="areaName" placeholder="Ex: Etage 1">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Zone ID</mat-label>
+        <input matInput formControlName="zoneId" type="number" placeholder="Ex: 3">
+      </mat-form-field>
+    </form>
+    <div class="eb-dialog-actions">
+      <button mat-button (click)="closeDialog()">Annuler</button>
+      <button mat-raised-button color="primary" [disabled]="userForm.invalid" (click)="saveUser()">
+        {{ isEditMode ? 'Mettre à jour' : 'Ajouter' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog Approbation -->
+<div *ngIf="showApproveDialog" class="eb-overlay" (click)="showApproveDialog = false">
+  <div class="eb-dialog" (click)="$event.stopPropagation()">
+    <div class="eb-dialog-header">
+      <mat-icon style="color:#22c55e">how_to_reg</mat-icon>
+      <h3>Approuver l'utilisateur</h3>
+    </div>
+    <p class="eb-dialog-sub">Assignez une zone à cet utilisateur avant de l'approuver.</p>
+    <form [formGroup]="approveForm" class="eb-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Zone ID</mat-label>
+        <input matInput formControlName="zoneId" type="number" placeholder="Ex: 1"/>
+        <mat-error>Zone ID requis</mat-error>
+      </mat-form-field>
+    </form>
+    <div class="eb-dialog-actions">
+      <button mat-button (click)="showApproveDialog = false">Annuler</button>
+      <button mat-raised-button color="primary"
+              [disabled]="approveForm.invalid"
+              (click)="confirmApprove()">
+        <mat-icon>check</mat-icon> Confirmer
+      </button>
+    </div>
+  </div>
+</div>
